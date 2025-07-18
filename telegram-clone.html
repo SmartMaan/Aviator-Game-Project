@@ -256,6 +256,177 @@
             font-size: 13px;
         }
 
+        .online-indicator {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 12px;
+            height: 12px;
+            background: #4CAF50;
+            border: 2px solid #17212b;
+            border-radius: 50%;
+        }
+
+        .offline-indicator {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 12px;
+            height: 12px;
+            background: #666;
+            border: 2px solid #17212b;
+            border-radius: 50%;
+        }
+
+        .user-status {
+            font-size: 11px;
+            color: #8899a6;
+            margin-top: 2px;
+        }
+
+        .user-bio {
+            font-size: 12px;
+            color: #8899a6;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        .profile-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .profile-content {
+            background: #17212b;
+            padding: 30px;
+            border-radius: 15px;
+            width: 400px;
+            max-width: 90vw;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .profile-content h2 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .profile-content input, .profile-content textarea {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 8px;
+            background: #243447;
+            color: white;
+            font-size: 14px;
+        }
+
+        .profile-content textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .profile-content button {
+            width: 48%;
+            padding: 12px;
+            margin: 10px 1%;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .save-btn {
+            background: #0088cc;
+            color: white;
+        }
+
+        .cancel-btn {
+            background: #666;
+            color: white;
+        }
+
+        .message-status {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 5px;
+        }
+
+        .read-indicator {
+            color: #0088cc;
+            font-size: 10px;
+        }
+
+        .unread-indicator {
+            color: #666;
+            font-size: 10px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #0088cc;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 3000;
+            animation: slideIn 0.3s ease-out;
+            cursor: pointer;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .notification.fade-out {
+            animation: fadeOut 0.3s ease-out forwards;
+        }
+
+        @keyframes fadeOut {
+            to { opacity: 0; transform: translateX(100%); }
+        }
+
+        .edit-profile-btn {
+            background: transparent;
+            border: 1px solid #0088cc;
+            color: #0088cc;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 11px;
+            margin-left: 10px;
+        }
+
+        .edit-profile-btn:hover {
+            background: #0088cc;
+            color: white;
+        }
+
+        .typing-indicator {
+            font-style: italic;
+            color: #0088cc;
+            font-size: 12px;
+            padding: 5px 20px;
+        }
+
+        .username-display {
+            font-size: 11px;
+            color: #0088cc;
+            margin-top: 2px;
+        }
+
         .messages-container {
             flex: 1;
             overflow-y: auto;
@@ -469,17 +640,24 @@
         <div class="sidebar">
             <div class="sidebar-header">
                 <div class="user-info">
-                    <div id="currentUserAvatar" class="user-avatar">U</div>
+                    <div id="currentUserAvatar" class="user-avatar" style="position: relative;">
+                        U
+                        <div class="online-indicator"></div>
+                    </div>
                     <div>
                         <div id="currentUserName">User</div>
-                        <div style="font-size: 12px; color: #8899a6;">online</div>
+                        <div id="currentUserUsername" class="username-display">@username</div>
+                        <div id="currentUserStatus" class="user-status">online</div>
                     </div>
                 </div>
-                <button class="logout-btn" onclick="signOut()">Logout</button>
+                <div>
+                    <button class="edit-profile-btn" onclick="openProfileModal()">Edit</button>
+                    <button class="logout-btn" onclick="signOut()">Logout</button>
+                </div>
             </div>
             
             <div class="search-box">
-                <input type="text" class="search-input" placeholder="Search" id="searchInput" oninput="filterChats()">
+                <input type="text" class="search-input" placeholder="Search by name or username" id="searchInput" oninput="filterChats()">
             </div>
             
             <div class="chat-list" id="chatList">
@@ -497,12 +675,19 @@
 
             <div id="chatScreen" class="hidden">
                 <div class="chat-header">
-                    <div id="chatHeaderAvatar" class="chat-header-avatar">U</div>
+                    <div id="chatHeaderAvatar" class="chat-header-avatar" style="position: relative;">
+                        U
+                        <div id="chatHeaderIndicator" class="online-indicator"></div>
+                    </div>
                     <div class="chat-header-info">
                         <h3 id="chatHeaderName">User</h3>
-                        <div class="chat-header-status">online</div>
+                        <div id="chatHeaderUsername" class="username-display">@username</div>
+                        <div id="chatHeaderStatus" class="chat-header-status">online</div>
+                        <div id="chatHeaderBio" class="user-bio"></div>
                     </div>
                 </div>
+
+                <div id="typingIndicator" class="typing-indicator hidden">Someone is typing...</div>
 
                 <div class="messages-container" id="messagesContainer">
                     <!-- Messages will be populated here -->
@@ -514,7 +699,7 @@
                         id="messageInput" 
                         placeholder="Write a message..." 
                         onkeypress="handleMessageKeyPress(event)"
-                        oninput="autoResize(this)"
+                        oninput="handleTyping(event)"
                     ></textarea>
                     <button class="send-button" onclick="sendMessage()">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -523,6 +708,24 @@
                     </button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div id="profileModal" class="profile-modal hidden">
+        <div class="profile-content">
+            <h2>Edit Profile</h2>
+            <input type="text" id="profileDisplayName" placeholder="Display Name" maxlength="50">
+            <input type="text" id="profileUsername" placeholder="Username (without @)" maxlength="30">
+            <textarea id="profileBio" placeholder="Bio" maxlength="200"></textarea>
+            <select id="profileStatus" style="width: 100%; padding: 12px; margin: 10px 0; border: none; border-radius: 8px; background: #243447; color: white;">
+                <option value="online">🟢 Online</option>
+                <option value="away">🟡 Away</option>
+                <option value="busy">🔴 Busy</option>
+                <option value="invisible">⚫ Invisible</option>
+            </select>
+            <button class="save-btn" onclick="saveProfile()">Save</button>
+            <button class="cancel-btn" onclick="closeProfileModal()">Cancel</button>
         </div>
     </div>
 
@@ -552,9 +755,13 @@
         // Global Variables
         let currentUser = null;
         let currentChatId = null;
+        let currentChatUserId = null;
         let users = {};
         let chats = {};
         let messages = {};
+        let typingTimeouts = {};
+        let lastSeen = {};
+        let notificationSound = null;
 
         // Initialize App
         auth.onAuthStateChanged((user) => {
@@ -564,10 +771,21 @@
                 initializeUser();
                 loadChats();
                 loadUsers();
+                setupNotifications();
             } else {
                 showLoginScreen();
             }
         });
+
+        // Setup notifications
+        function setupNotifications() {
+            if ('Notification' in window) {
+                Notification.requestPermission();
+            }
+            
+            // Create notification sound
+            notificationSound = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmYdBzaG0O/XeycEf3/K7+OZURE0;');
+        }
 
         // Authentication Functions
         function signIn() {
@@ -599,12 +817,16 @@
                     // Create user profile
                     const user = userCredential.user;
                     const displayName = email.split('@')[0];
+                    const username = displayName.toLowerCase().replace(/[^a-z0-9]/g, '');
                     return database.ref('users/' + user.uid).set({
                         email: email,
                         displayName: displayName,
+                        username: username,
+                        bio: '',
                         avatar: displayName.charAt(0).toUpperCase(),
                         lastSeen: firebase.database.ServerValue.TIMESTAMP,
-                        online: true
+                        online: true,
+                        status: 'online'
                     });
                 })
                 .catch((error) => {
@@ -645,23 +867,58 @@
         function initializeUser() {
             const userRef = database.ref('users/' + currentUser.uid);
             const displayName = currentUser.email.split('@')[0];
+            const username = displayName.toLowerCase().replace(/[^a-z0-9]/g, '');
             
-            userRef.update({
-                email: currentUser.email,
-                displayName: displayName,
-                avatar: displayName.charAt(0).toUpperCase(),
-                lastSeen: firebase.database.ServerValue.TIMESTAMP,
-                online: true
+            userRef.once('value', (snapshot) => {
+                const userData = snapshot.val();
+                if (!userData) {
+                    // Create new user profile
+                    userRef.set({
+                        email: currentUser.email,
+                        displayName: displayName,
+                        username: username,
+                        bio: '',
+                        avatar: displayName.charAt(0).toUpperCase(),
+                        lastSeen: firebase.database.ServerValue.TIMESTAMP,
+                        online: true,
+                        status: 'online'
+                    });
+                } else {
+                    // Update existing user
+                    userRef.update({
+                        online: true,
+                        lastSeen: firebase.database.ServerValue.TIMESTAMP
+                    });
+                }
+                
+                // Load user data for UI
+                userRef.on('value', (snapshot) => {
+                    const user = snapshot.val();
+                    if (user) {
+                        updateCurrentUserUI(user);
+                    }
+                });
             });
-
-            // Update UI
-            document.getElementById('currentUserName').textContent = displayName;
-            document.getElementById('currentUserAvatar').textContent = displayName.charAt(0).toUpperCase();
 
             // Set offline when window closes
             window.addEventListener('beforeunload', () => {
-                userRef.update({ online: false });
+                userRef.update({ 
+                    online: false,
+                    lastSeen: firebase.database.ServerValue.TIMESTAMP 
+                });
             });
+
+            // Update last seen periodically
+            setInterval(() => {
+                userRef.update({ lastSeen: firebase.database.ServerValue.TIMESTAMP });
+            }, 30000);
+        }
+
+        function updateCurrentUserUI(user) {
+            document.getElementById('currentUserName').textContent = user.displayName;
+            document.getElementById('currentUserUsername').textContent = '@' + user.username;
+            document.getElementById('currentUserAvatar').textContent = user.avatar;
+            document.getElementById('currentUserStatus').textContent = getStatusText(user.status);
         }
 
         function loadUsers() {
@@ -695,11 +952,16 @@
                     
                     const lastMessage = getLastMessage(chatId);
                     const unreadCount = getUnreadCount(chatId);
+                    const onlineIndicator = user.online ? 'online-indicator' : 'offline-indicator';
                     
                     chatItem.innerHTML = `
-                        <div class="chat-avatar">${user.avatar || user.displayName.charAt(0).toUpperCase()}</div>
+                        <div class="chat-avatar" style="position: relative;">
+                            ${user.avatar || user.displayName.charAt(0).toUpperCase()}
+                            <div class="${onlineIndicator}"></div>
+                        </div>
                         <div class="chat-info">
                             <div class="chat-name">${user.displayName}</div>
+                            <div class="username-display">@${user.username || 'username'}</div>
                             <div class="chat-last-message">${lastMessage.text || 'No messages yet'}</div>
                         </div>
                         <div class="chat-meta">
@@ -732,12 +994,22 @@
         }
 
         function getUnreadCount(chatId) {
-            // For demo purposes, return 0. In a real app, you'd track read status
-            return 0;
+            const chatMessages = chats[chatId]?.messages || {};
+            let unreadCount = 0;
+            
+            Object.keys(chatMessages).forEach(messageId => {
+                const message = chatMessages[messageId];
+                if (message.senderId !== currentUser.uid && !message.readBy?.[currentUser.uid]) {
+                    unreadCount++;
+                }
+            });
+            
+            return unreadCount;
         }
 
         function openChat(chatId, otherUserId) {
             currentChatId = chatId;
+            currentChatUserId = otherUserId;
             const otherUser = users[otherUserId];
             
             // Update active chat item
@@ -748,7 +1020,17 @@
             
             // Update chat header
             document.getElementById('chatHeaderName').textContent = otherUser.displayName;
+            document.getElementById('chatHeaderUsername').textContent = '@' + (otherUser.username || 'username');
             document.getElementById('chatHeaderAvatar').textContent = otherUser.avatar || otherUser.displayName.charAt(0).toUpperCase();
+            document.getElementById('chatHeaderStatus').textContent = getLastSeenText(otherUser);
+            document.getElementById('chatHeaderBio').textContent = otherUser.bio || '';
+            
+            // Update online indicator
+            const indicator = document.getElementById('chatHeaderIndicator');
+            indicator.className = otherUser.online ? 'online-indicator' : 'offline-indicator';
+            
+            // Mark messages as read
+            markMessagesAsRead(chatId);
             
             // Load messages
             loadMessages(chatId);
@@ -762,6 +1044,16 @@
             messagesRef.on('value', (snapshot) => {
                 const messagesData = snapshot.val() || {};
                 displayMessages(messagesData);
+                
+                // Check for new messages and show notifications
+                Object.keys(messagesData).forEach(messageId => {
+                    const message = messagesData[messageId];
+                    if (message.senderId !== currentUser.uid && 
+                        !message.readBy?.[currentUser.uid] && 
+                        currentChatId !== chatId) {
+                        showNotification(message, users[message.senderId]);
+                    }
+                });
             });
         }
 
@@ -785,12 +1077,25 @@
             
             const sender = users[message.senderId];
             const avatar = sender ? (sender.avatar || sender.displayName.charAt(0).toUpperCase()) : 'U';
+            const isOwn = message.senderId === currentUser.uid;
+            
+            let statusIcon = '';
+            if (isOwn) {
+                const readBy = message.readBy || {};
+                const readByOther = Object.keys(readBy).some(userId => userId !== currentUser.uid);
+                statusIcon = readByOther ? 
+                    '<span class="read-indicator">✓✓</span>' : 
+                    '<span class="unread-indicator">✓</span>';
+            }
             
             messageDiv.innerHTML = `
                 <div class="message-avatar">${avatar}</div>
                 <div class="message-content">
                     <div class="message-text">${escapeHtml(message.text)}</div>
-                    <div class="message-time">${formatTime(message.timestamp)}</div>
+                    <div class="message-status">
+                        <span class="message-time">${formatTime(message.timestamp)}</span>
+                        ${statusIcon}
+                    </div>
                 </div>
             `;
             
@@ -806,12 +1111,20 @@
             const message = {
                 text: text,
                 senderId: currentUser.uid,
-                timestamp: firebase.database.ServerValue.TIMESTAMP
+                timestamp: firebase.database.ServerValue.TIMESTAMP,
+                readBy: {
+                    [currentUser.uid]: true
+                }
             };
             
             database.ref('chats/' + currentChatId + '/messages').push(message);
             messageInput.value = '';
             autoResize(messageInput);
+            
+            // Stop typing indicator
+            if (currentChatUserId) {
+                database.ref('typing/' + currentChatId + '/' + currentUser.uid).remove();
+            }
         }
 
         function handleMessageKeyPress(event) {
@@ -821,9 +1134,46 @@
             }
         }
 
+        function handleTyping(event) {
+            autoResize(event.target);
+            
+            if (!currentChatId || !currentChatUserId) return;
+            
+            const typingRef = database.ref('typing/' + currentChatId + '/' + currentUser.uid);
+            
+            // Set typing indicator
+            typingRef.set(true);
+            
+            // Clear previous timeout
+            if (typingTimeouts[currentChatId]) {
+                clearTimeout(typingTimeouts[currentChatId]);
+            }
+            
+            // Remove typing indicator after 3 seconds
+            typingTimeouts[currentChatId] = setTimeout(() => {
+                typingRef.remove();
+            }, 3000);
+        }
+
         function autoResize(textarea) {
             textarea.style.height = 'auto';
             textarea.style.height = Math.min(textarea.scrollHeight, 100) + 'px';
+        }
+
+        // Listen for typing indicators
+        function listenForTyping(chatId) {
+            database.ref('typing/' + chatId).on('value', (snapshot) => {
+                const typingData = snapshot.val() || {};
+                const typingUsers = Object.keys(typingData).filter(uid => uid !== currentUser.uid);
+                
+                const typingIndicator = document.getElementById('typingIndicator');
+                if (typingUsers.length > 0 && chatId === currentChatId) {
+                    typingIndicator.textContent = `${users[typingUsers[0]]?.displayName || 'Someone'} is typing...`;
+                    typingIndicator.classList.remove('hidden');
+                } else {
+                    typingIndicator.classList.add('hidden');
+                }
+            });
         }
 
         // Search Functions
@@ -833,7 +1183,9 @@
             
             chatItems.forEach(item => {
                 const chatName = item.querySelector('.chat-name').textContent.toLowerCase();
-                if (chatName.includes(searchTerm)) {
+                const username = item.querySelector('.username-display').textContent.toLowerCase();
+                
+                if (chatName.includes(searchTerm) || username.includes(searchTerm)) {
                     item.style.display = 'flex';
                 } else {
                     item.style.display = 'none';
@@ -862,9 +1214,161 @@
             return div.innerHTML;
         }
 
+        // Additional Functions
+        function markMessagesAsRead(chatId) {
+            const messagesRef = database.ref('chats/' + chatId + '/messages');
+            messagesRef.once('value', (snapshot) => {
+                const messages = snapshot.val() || {};
+                const updates = {};
+                
+                Object.keys(messages).forEach(messageId => {
+                    const message = messages[messageId];
+                    if (message.senderId !== currentUser.uid && !message.readBy?.[currentUser.uid]) {
+                        updates[`${messageId}/readBy/${currentUser.uid}`] = true;
+                    }
+                });
+                
+                if (Object.keys(updates).length > 0) {
+                    messagesRef.update(updates);
+                }
+            });
+        }
+
+        function showNotification(message, sender) {
+            if (!sender) return;
+            
+            // Browser notification
+            if (Notification.permission === 'granted') {
+                const notification = new Notification(`${sender.displayName}`, {
+                    body: message.text,
+                    icon: '/favicon.ico'
+                });
+                
+                notification.onclick = () => {
+                    window.focus();
+                    notification.close();
+                };
+                
+                setTimeout(() => notification.close(), 5000);
+            }
+            
+            // In-app notification
+            const notificationEl = document.createElement('div');
+            notificationEl.className = 'notification';
+            notificationEl.innerHTML = `
+                <strong>${sender.displayName}</strong><br>
+                ${message.text.substring(0, 50)}${message.text.length > 50 ? '...' : ''}
+            `;
+            
+            notificationEl.onclick = () => {
+                notificationEl.remove();
+            };
+            
+            document.body.appendChild(notificationEl);
+            
+            // Play sound
+            if (notificationSound) {
+                notificationSound.play().catch(() => {});
+            }
+            
+            // Auto remove
+            setTimeout(() => {
+                notificationEl.classList.add('fade-out');
+                setTimeout(() => notificationEl.remove(), 300);
+            }, 5000);
+        }
+
+        function getLastSeenText(user) {
+            if (user.online) {
+                return getStatusText(user.status);
+            } else if (user.lastSeen) {
+                const diff = Date.now() - user.lastSeen;
+                if (diff < 60000) return 'last seen just now';
+                if (diff < 3600000) return `last seen ${Math.floor(diff / 60000)} minutes ago`;
+                if (diff < 86400000) return `last seen ${Math.floor(diff / 3600000)} hours ago`;
+                return `last seen ${Math.floor(diff / 86400000)} days ago`;
+            }
+            return 'offline';
+        }
+
+        function getStatusText(status) {
+            switch (status) {
+                case 'online': return 'online';
+                case 'away': return 'away';
+                case 'busy': return 'busy';
+                case 'invisible': return 'last seen recently';
+                default: return 'online';
+            }
+        }
+
+        // Profile Modal Functions
+        function openProfileModal() {
+            const userRef = database.ref('users/' + currentUser.uid);
+            userRef.once('value', (snapshot) => {
+                const user = snapshot.val();
+                if (user) {
+                    document.getElementById('profileDisplayName').value = user.displayName || '';
+                    document.getElementById('profileUsername').value = user.username || '';
+                    document.getElementById('profileBio').value = user.bio || '';
+                    document.getElementById('profileStatus').value = user.status || 'online';
+                }
+            });
+            
+            document.getElementById('profileModal').classList.remove('hidden');
+        }
+
+        function closeProfileModal() {
+            document.getElementById('profileModal').classList.add('hidden');
+        }
+
+        function saveProfile() {
+            const displayName = document.getElementById('profileDisplayName').value.trim();
+            const username = document.getElementById('profileUsername').value.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+            const bio = document.getElementById('profileBio').value.trim();
+            const status = document.getElementById('profileStatus').value;
+            
+            if (!displayName || !username) {
+                alert('Display name and username are required');
+                return;
+            }
+            
+            // Check if username is unique
+            database.ref('users').orderByChild('username').equalTo(username).once('value', (snapshot) => {
+                const existingUsers = snapshot.val() || {};
+                const existingUser = Object.keys(existingUsers).find(uid => uid !== currentUser.uid);
+                
+                if (existingUser) {
+                    alert('Username already taken. Please choose another one.');
+                    return;
+                }
+                
+                // Update profile
+                const updates = {
+                    displayName: displayName,
+                    username: username,
+                    bio: bio,
+                    status: status,
+                    avatar: displayName.charAt(0).toUpperCase()
+                };
+                
+                database.ref('users/' + currentUser.uid).update(updates).then(() => {
+                    closeProfileModal();
+                }).catch((error) => {
+                    alert('Failed to update profile: ' + error.message);
+                });
+            });
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             showLoginScreen();
+            
+            // Update chat list when opening a chat to setup typing listeners
+            const originalOpenChat = openChat;
+            window.openChat = function(chatId, otherUserId) {
+                originalOpenChat(chatId, otherUserId);
+                listenForTyping(chatId);
+            };
         });
     </script>
 </body>
