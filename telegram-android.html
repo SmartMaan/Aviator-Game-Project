@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title>Telegram</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -67,10 +70,43 @@
         /* Main Container */
         .app-container {
             height: calc(100vh - var(--status-bar-height));
+            height: calc(100dvh - var(--status-bar-height)); /* Dynamic viewport height */
             display: flex;
             flex-direction: column;
             position: relative;
             overflow: hidden;
+            max-width: 414px;
+            margin: 0 auto;
+            min-height: -webkit-fill-available; /* iOS Safari fix */
+        }
+
+        /* Android specific optimizations */
+        @media screen and (max-width: 480px) {
+            .app-container {
+                max-width: 100%;
+            }
+            
+            .auth-btn {
+                min-height: 48px; /* Android touch target */
+                font-size: 16px;
+            }
+            
+            .phone-input, .auth-input {
+                min-height: 48px; /* Android touch target */
+                font-size: 16px; /* Prevent zoom on iOS */
+                padding: 14px 16px;
+            }
+            
+            .otp-input {
+                width: 44px;
+                height: 52px;
+                font-size: 20px;
+            }
+            
+            .country-selector {
+                min-height: 48px;
+                padding: 14px 16px;
+            }
         }
 
         /* Toolbar/Header */
@@ -1224,6 +1260,29 @@
                 </div>
             </div>
 
+            <!-- Phone User Info -->
+            <div id="phoneUserInfoScreen" class="auth-step">
+                <div class="toolbar">
+                    <span class="material-icons toolbar-menu" onclick="goBackAuth()">arrow_back</span>
+                    <div class="toolbar-title">Your Info</div>
+                </div>
+                <div class="auth-content">
+                    <div class="auth-info">
+                        <p>Enter your name and email to complete registration.</p>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" class="auth-input" id="phoneFirstNameInput" placeholder="First Name">
+                    </div>
+                    <div class="input-group">
+                        <input type="text" class="auth-input" id="phoneLastNameInput" placeholder="Last Name (Optional)">
+                    </div>
+                    <div class="input-group">
+                        <input type="email" class="auth-input" id="phoneEmailInput" placeholder="Email address">
+                    </div>
+                    <button class="auth-btn primary" onclick="proceedToPhoneUsername()">Next</button>
+                </div>
+            </div>
+
             <!-- Username Selection -->
             <div id="usernameScreen" class="auth-step">
                 <div class="toolbar">
@@ -1499,6 +1558,7 @@
             const savedUser = localStorage.getItem('telegramUser');
             if (savedUser) {
                 currentUser = JSON.parse(savedUser);
+                loadAllUsers(); // Load all registered users
                 initializeApp();
                 showMainApp();
             } else {
@@ -1524,7 +1584,10 @@
         }
 
         function initializeApp() {
-            loadMockData();
+            // Load real users first, then mock data if needed
+            if (Object.keys(users).length === 0) {
+                loadMockData();
+            }
             updateUserInfo();
         }
 
@@ -2100,11 +2163,18 @@
                 case 'otpScreen':
                     showAuthStep('phoneAuthScreen');
                     break;
+                case 'phoneUserInfoScreen':
+                    showAuthStep('otpScreen');
+                    break;
                 case 'emailRegisterScreen':
                     showAuthStep('emailAuthScreen');
                     break;
                 case 'usernameScreen':
-                    showAuthStep('emailRegisterScreen');
+                    if (tempUserData.phone) {
+                        showAuthStep('phoneUserInfoScreen');
+                    } else {
+                        showAuthStep('emailRegisterScreen');
+                    }
                     break;
                 default:
                     showAuthStep('welcomeAuthScreen');
@@ -2210,19 +2280,20 @@
         function verifyOTP(code) {
             // Demo OTP verification (always accept 123456)
             if (code === '123456') {
-                // Check if user exists or needs registration
+                // Check if user exists by phone number
                 const existingUser = registeredUsers.find(user => user.phone === tempUserData.phone);
                 
                 if (existingUser) {
                     // User exists, log them in
                     currentUser = existingUser;
                     localStorage.setItem('telegramUser', JSON.stringify(currentUser));
+                    loadAllUsers(); // Load all registered users for chat list
                     initializeApp();
                     showMainApp();
+                    alert(`Welcome back, ${existingUser.displayName}!`);
                 } else {
-                    // New user, go to username selection
-                    showAuthStep('usernameScreen');
-                    generateUsernameSuggestions();
+                    // New user, collect user info first
+                    showAuthStep('phoneUserInfoScreen');
                 }
             } else {
                 alert('Invalid OTP. Please try again.');
@@ -2254,11 +2325,39 @@
             if (existingUser) {
                 currentUser = existingUser;
                 localStorage.setItem('telegramUser', JSON.stringify(currentUser));
+                loadAllUsers(); // Load all registered users for chat list
                 initializeApp();
                 showMainApp();
+                alert(`Welcome back, ${existingUser.displayName}!`);
             } else {
                 alert('Invalid email or password');
             }
+        }
+
+        function proceedToPhoneUsername() {
+            const firstName = document.getElementById('phoneFirstNameInput').value.trim();
+            const lastName = document.getElementById('phoneLastNameInput').value.trim();
+            const email = document.getElementById('phoneEmailInput').value.trim();
+            
+            if (!firstName || !email) {
+                alert('Please fill in first name and email');
+                return;
+            }
+            
+            // Check if email already exists
+            const existingUser = registeredUsers.find(user => user.email === email);
+            if (existingUser) {
+                alert('Email already registered. Please use a different email.');
+                return;
+            }
+            
+            tempUserData.firstName = firstName;
+            tempUserData.lastName = lastName;
+            tempUserData.email = email;
+            tempUserData.displayName = lastName ? `${firstName} ${lastName}` : firstName;
+            
+            showAuthStep('usernameScreen');
+            generateUsernameSuggestions();
         }
 
         function checkUsernameAvailability() {
@@ -2289,6 +2388,7 @@
             tempUserData.email = email;
             tempUserData.password = password;
             tempUserData.displayName = lastName ? `${firstName} ${lastName}` : firstName;
+            tempUserData.phone = null; // Mark as email registration
             
             showAuthStep('usernameScreen');
             generateUsernameSuggestions();
@@ -2366,11 +2466,11 @@
             const newUser = {
                 uid: 'user_' + Date.now(),
                 firstName: tempUserData.firstName,
-                lastName: tempUserData.lastName,
+                lastName: tempUserData.lastName || '',
                 displayName: tempUserData.displayName,
                 email: tempUserData.email,
-                password: tempUserData.password,
-                phone: tempUserData.phone,
+                password: tempUserData.password || null,
+                phone: tempUserData.phone || null,
                 username: username,
                 avatar: tempUserData.firstName.charAt(0).toUpperCase(),
                 bio: 'Available',
@@ -2378,7 +2478,7 @@
                 lastSeen: Date.now()
             };
             
-            // Save user
+            // Save user to registered users list
             registeredUsers.push(newUser);
             localStorage.setItem('telegramUsers', JSON.stringify(registeredUsers));
             
@@ -2389,11 +2489,15 @@
             // Clear temp data
             tempUserData = {};
             
-            // Initialize app
+            // Load all users and initialize app
+            loadAllUsers();
             initializeApp();
             showMainApp();
             
-            alert('Account created successfully! Welcome to Telegram!');
+            // Show success message
+            setTimeout(() => {
+                alert(`Welcome to Telegram, ${newUser.displayName}!`);
+            }, 500);
         }
 
         // Load registered users from localStorage
@@ -2402,6 +2506,20 @@
             if (savedUsers) {
                 registeredUsers = JSON.parse(savedUsers);
             }
+        }
+
+        // Load all registered users into the app's users object
+        function loadAllUsers() {
+            users = {}; // Clear existing users
+            
+            // Add all registered users except current user
+            registeredUsers.forEach(user => {
+                if (user.uid !== currentUser.uid) {
+                    users[user.uid] = user;
+                }
+            });
+            
+            console.log('Loaded users:', Object.keys(users).length);
         }
 
         // Call this on page load
