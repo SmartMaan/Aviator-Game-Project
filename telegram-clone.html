@@ -24,65 +24,220 @@
             height: 100vh;
         }
 
-        /* Login Screen */
-        .login-screen {
+        /* Auth Screen */
+        .auth-screen {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #17212b;
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 1000;
         }
 
-        .login-form {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 40px;
-            border-radius: 20px;
+        .auth-container {
+            background: #ffffff;
+            width: 400px;
+            max-width: 90vw;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+
+        .auth-header {
+            background: #0088cc;
+            color: white;
+            padding: 30px 40px 20px;
             text-align: center;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            position: relative;
         }
 
-        .login-form h1 {
-            margin-bottom: 30px;
-            font-size: 2.5em;
-            color: white;
+        .telegram-logo {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: #0088cc;
+            font-weight: bold;
         }
 
-        .login-form input {
-            width: 300px;
-            padding: 15px;
-            margin: 10px 0;
-            border: none;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
+        .auth-title {
+            font-size: 24px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .auth-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+            line-height: 1.4;
+        }
+
+        .auth-form {
+            padding: 30px 40px 40px;
+            background: white;
+            color: #333;
+        }
+
+        .auth-step {
+            display: none;
+        }
+
+        .auth-step.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
             font-size: 16px;
+            transition: all 0.3s;
+            background: #f8f9fa;
         }
 
-        .login-form input::placeholder {
-            color: rgba(255, 255, 255, 0.7);
+        .form-input:focus {
+            outline: none;
+            border-color: #0088cc;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(0, 136, 204, 0.1);
         }
 
-        .login-form button {
-            width: 300px;
-            padding: 15px;
-            margin: 20px 0 10px 0;
+        .form-input::placeholder {
+            color: #adb5bd;
+        }
+
+        .auth-button {
+            width: 100%;
+            padding: 16px;
             border: none;
-            border-radius: 10px;
+            border-radius: 8px;
             background: #0088cc;
             color: white;
             font-size: 16px;
+            font-weight: 500;
             cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .auth-button:hover {
+            background: #0077b3;
+            transform: translateY(-1px);
+        }
+
+        .auth-button:active {
+            transform: translateY(0);
+        }
+
+        .auth-button:disabled {
+            background: #adb5bd;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .auth-link {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e1e5e9;
+        }
+
+        .auth-link button {
+            background: none;
+            border: none;
+            color: #0088cc;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: underline;
+        }
+
+        .back-button {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
             transition: background 0.3s;
         }
 
-        .login-form button:hover {
-            background: #006699;
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .country-input-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .country-code {
+            width: 80px;
+            flex-shrink: 0;
+        }
+
+        .phone-number {
+            flex: 1;
+        }
+
+        .verification-info {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .code-inputs {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .code-input {
+            width: 45px;
+            height: 50px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+
+        .code-input:focus {
+            outline: none;
+            border-color: #0088cc;
+            background: white;
         }
 
         /* Sidebar */
@@ -561,6 +716,95 @@
             margin-bottom: 30px;
         }
 
+        /* Users List */
+        .users-list {
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .users-header {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #ffffff;
+            text-align: center;
+        }
+
+        .user-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-bottom: 8px;
+        }
+
+        .user-item:hover {
+            background: #243447;
+        }
+
+        .user-item-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #0088cc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .user-item-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .user-item-name {
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 3px;
+            color: #ffffff;
+        }
+
+        .user-item-details {
+            font-size: 13px;
+            color: #8899a6;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .home-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .home-header {
+            padding: 20px;
+            background: #0e1621;
+            border-bottom: 1px solid #2c3e50;
+            text-align: center;
+        }
+
+        .home-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffffff;
+            margin-bottom: 8px;
+        }
+
+        .home-subtitle {
+            color: #8899a6;
+            font-size: 14px;
+        }
+
         /* Utility Classes */
         .hidden {
             display: none !important;
@@ -621,17 +865,104 @@
     </style>
 </head>
 <body>
-    <!-- Login Screen -->
-    <div id="loginScreen" class="login-screen">
-        <div class="login-form">
-            <h1>📱 Telegram Clone</h1>
-            <input type="email" id="emailInput" placeholder="Email" required>
-            <input type="password" id="passwordInput" placeholder="Password" required>
-            <button onclick="signIn()">Sign In</button>
-            <button onclick="signUp()">Sign Up</button>
-            <p style="color: rgba(255,255,255,0.7); margin-top: 10px; font-size: 12px;">
-                Use any email/password to create an account
-            </p>
+    <!-- Auth Screen -->
+    <div id="authScreen" class="auth-screen">
+        <div class="auth-container">
+            <div class="auth-header">
+                <button id="backButton" class="back-button hidden" onclick="goBackStep()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                    </svg>
+                </button>
+                <div class="telegram-logo">T</div>
+                <div class="auth-title" id="authTitle">Sign in to Telegram</div>
+                <div class="auth-subtitle" id="authSubtitle">Please confirm your country code and enter your phone number.</div>
+            </div>
+            
+            <div class="auth-form">
+                <!-- Step 1: Phone Number -->
+                <div id="phoneStep" class="auth-step active">
+                    <div class="form-group">
+                        <label class="form-label">Country</label>
+                        <select class="form-input" id="countrySelect">
+                            <option value="+1">🇺🇸 United States</option>
+                            <option value="+44">🇬🇧 United Kingdom</option>
+                            <option value="+91">🇮🇳 India</option>
+                            <option value="+86">🇨🇳 China</option>
+                            <option value="+81">🇯🇵 Japan</option>
+                            <option value="+49">🇩🇪 Germany</option>
+                            <option value="+33">🇫🇷 France</option>
+                            <option value="+7">🇷🇺 Russia</option>
+                            <option value="+55">🇧🇷 Brazil</option>
+                            <option value="+61">🇦🇺 Australia</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Phone Number</label>
+                        <div class="country-input-container">
+                            <input type="text" class="form-input country-code" id="countryCode" value="+1" readonly>
+                            <input type="tel" class="form-input phone-number" id="phoneNumber" placeholder="XXX XXX XXXX">
+                        </div>
+                    </div>
+                    <button class="auth-button" onclick="requestCode()">Next</button>
+                    <div class="auth-link">
+                        <button onclick="showEmailLogin()">Sign in with Email instead</button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Verification Code -->
+                <div id="codeStep" class="auth-step">
+                    <div class="verification-info">
+                        <strong>We have sent you an SMS with the code.</strong><br>
+                        We've sent an SMS with an activation code to your phone <span id="displayPhone"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Code</label>
+                        <div class="code-inputs">
+                            <input type="text" class="code-input" maxlength="1" oninput="moveToNext(this, 0)">
+                            <input type="text" class="code-input" maxlength="1" oninput="moveToNext(this, 1)">
+                            <input type="text" class="code-input" maxlength="1" oninput="moveToNext(this, 2)">
+                            <input type="text" class="code-input" maxlength="1" oninput="moveToNext(this, 3)">
+                            <input type="text" class="code-input" maxlength="1" oninput="moveToNext(this, 4)">
+                        </div>
+                    </div>
+                    <button class="auth-button" onclick="verifyCode()">Confirm</button>
+                </div>
+
+                <!-- Step 3: Profile Setup -->
+                <div id="profileStep" class="auth-step">
+                    <div class="form-group">
+                        <label class="form-label">First Name</label>
+                        <input type="text" class="form-input" id="firstName" placeholder="First Name">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Last Name (Optional)</label>
+                        <input type="text" class="form-input" id="lastName" placeholder="Last Name">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Username</label>
+                        <input type="text" class="form-input" id="username" placeholder="Username">
+                    </div>
+                    <button class="auth-button" onclick="completeRegistration()">Start Messaging</button>
+                </div>
+
+                <!-- Email Login -->
+                <div id="emailStep" class="auth-step">
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" id="emailInput" placeholder="your@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-input" id="passwordInput" placeholder="Password">
+                    </div>
+                    <button class="auth-button" onclick="signIn()">Sign In</button>
+                    <button class="auth-button" onclick="signUp()" style="background: #28a745; margin-top: 10px;">Create Account</button>
+                    <div class="auth-link">
+                        <button onclick="showPhoneLogin()">Use Phone Number instead</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -668,9 +999,18 @@
         <!-- Main Chat Area -->
         <div class="main-chat">
             <div id="welcomeScreen" class="welcome-screen">
-                <div class="welcome-icon">💬</div>
-                <h2>Welcome to Telegram Clone</h2>
-                <p>Select a chat to start messaging</p>
+                <div class="home-container">
+                    <div class="home-header">
+                        <div class="home-title">Welcome to Telegram</div>
+                        <div class="home-subtitle">Connect with people around the world</div>
+                    </div>
+                    <div class="users-list">
+                        <div class="users-header">All Users</div>
+                        <div id="allUsersList">
+                            <!-- Users will be populated here -->
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div id="chatScreen" class="hidden">
@@ -762,6 +1102,8 @@
         let typingTimeouts = {};
         let lastSeen = {};
         let notificationSound = null;
+        let authStep = 'phone';
+        let tempUserData = {};
 
         // Initialize App
         auth.onAuthStateChanged((user) => {
@@ -771,6 +1113,7 @@
                 initializeUser();
                 loadChats();
                 loadUsers();
+                loadAllUsers();
                 setupNotifications();
             } else {
                 showLoginScreen();
@@ -843,12 +1186,12 @@
 
         // UI Functions
         function showLoginScreen() {
-            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('authScreen').classList.remove('hidden');
             document.getElementById('mainApp').classList.add('hidden');
         }
 
         function showMainApp() {
-            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('authScreen').classList.add('hidden');
             document.getElementById('mainApp').classList.remove('hidden');
         }
 
@@ -973,6 +1316,51 @@
                     chatList.appendChild(chatItem);
                 }
             });
+        }
+
+        function loadAllUsers() {
+            database.ref('users').on('value', (snapshot) => {
+                const allUsers = snapshot.val() || {};
+                updateAllUsersList(allUsers);
+            });
+        }
+
+        function updateAllUsersList(allUsers) {
+            const usersList = document.getElementById('allUsersList');
+            usersList.innerHTML = '';
+
+            Object.keys(allUsers).forEach(userId => {
+                if (userId !== currentUser?.uid) {
+                    const user = allUsers[userId];
+                    const onlineIndicator = user.online ? 'online-indicator' : 'offline-indicator';
+                    
+                    const userItem = document.createElement('div');
+                    userItem.className = 'user-item';
+                    userItem.onclick = () => startChatWithUser(userId);
+                    
+                    userItem.innerHTML = `
+                        <div class="user-item-avatar" style="position: relative;">
+                            ${user.avatar || user.displayName.charAt(0).toUpperCase()}
+                            <div class="${onlineIndicator}"></div>
+                        </div>
+                        <div class="user-item-info">
+                            <div class="user-item-name">${user.displayName}</div>
+                            <div class="user-item-details">
+                                <span>@${user.username || 'username'}</span>
+                                ${user.bio ? `<span>${user.bio}</span>` : ''}
+                                <span>${getLastSeenText(user)}</span>
+                            </div>
+                        </div>
+                    `;
+                    
+                    usersList.appendChild(userItem);
+                }
+            });
+        }
+
+        function startChatWithUser(userId) {
+            const chatId = getChatId(currentUser.uid, userId);
+            openChat(chatId, userId);
         }
 
         function getChatId(uid1, uid2) {
@@ -1358,6 +1746,140 @@
                 });
             });
         }
+
+        // Auth Flow Functions
+        function showPhoneLogin() {
+            authStep = 'phone';
+            showStep('phoneStep');
+            updateAuthHeader('Sign in to Telegram', 'Please confirm your country code and enter your phone number.');
+            document.getElementById('backButton').classList.add('hidden');
+        }
+
+        function showEmailLogin() {
+            authStep = 'email';
+            showStep('emailStep');
+            updateAuthHeader('Sign in with Email', 'Enter your email and password to continue.');
+            document.getElementById('backButton').classList.remove('hidden');
+        }
+
+        function showStep(stepId) {
+            document.querySelectorAll('.auth-step').forEach(step => {
+                step.classList.remove('active');
+            });
+            document.getElementById(stepId).classList.add('active');
+        }
+
+        function updateAuthHeader(title, subtitle) {
+            document.getElementById('authTitle').textContent = title;
+            document.getElementById('authSubtitle').textContent = subtitle;
+        }
+
+        function goBackStep() {
+            if (authStep === 'email') {
+                showPhoneLogin();
+            } else if (authStep === 'code') {
+                showPhoneLogin();
+            } else if (authStep === 'profile') {
+                showStep('codeStep');
+                authStep = 'code';
+                updateAuthHeader('Enter Code', 'Please enter the verification code.');
+            }
+        }
+
+        function requestCode() {
+            const countryCode = document.getElementById('countryCode').value;
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            
+            if (!phoneNumber) {
+                alert('Please enter your phone number');
+                return;
+            }
+            
+            const fullPhone = countryCode + phoneNumber;
+            document.getElementById('displayPhone').textContent = fullPhone;
+            tempUserData.phone = fullPhone;
+            
+            authStep = 'code';
+            showStep('codeStep');
+            updateAuthHeader('Enter Code', 'We have sent you an SMS with the code.');
+            document.getElementById('backButton').classList.remove('hidden');
+        }
+
+        function moveToNext(current, index) {
+            if (current.value.length === 1 && index < 4) {
+                const nextInput = document.querySelectorAll('.code-input')[index + 1];
+                if (nextInput) nextInput.focus();
+            }
+            
+            // Check if all codes are filled
+            const codes = Array.from(document.querySelectorAll('.code-input')).map(input => input.value);
+            if (codes.every(code => code.length === 1)) {
+                // Auto verify
+                setTimeout(() => verifyCode(), 500);
+            }
+        }
+
+        function verifyCode() {
+            const codes = Array.from(document.querySelectorAll('.code-input')).map(input => input.value);
+            const code = codes.join('');
+            
+            if (code.length !== 5) {
+                alert('Please enter the complete verification code');
+                return;
+            }
+            
+            // For demo purposes, accept any 5-digit code
+            authStep = 'profile';
+            showStep('profileStep');
+            updateAuthHeader('Your Info', 'Please provide your name and username.');
+        }
+
+        function completeRegistration() {
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const username = document.getElementById('username').value.trim();
+            
+            if (!firstName || !username) {
+                alert('Please enter your first name and username');
+                return;
+            }
+            
+            const displayName = lastName ? `${firstName} ${lastName}` : firstName;
+            const email = `${username}@telegram.demo`; // Demo email
+            const password = 'demo123'; // Demo password
+            
+            // Create account with Firebase
+            auth.createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    return database.ref('users/' + user.uid).set({
+                        email: email,
+                        displayName: displayName,
+                        username: username.toLowerCase().replace(/[^a-z0-9]/g, ''),
+                        bio: '',
+                        avatar: firstName.charAt(0).toUpperCase(),
+                        lastSeen: firebase.database.ServerValue.TIMESTAMP,
+                        online: true,
+                        status: 'online',
+                        phone: tempUserData.phone
+                    });
+                })
+                .catch((error) => {
+                    alert('Registration failed: ' + error.message);
+                });
+        }
+
+        // Update country code when country changes
+        document.addEventListener('DOMContentLoaded', () => {
+            const countrySelect = document.getElementById('countrySelect');
+            const countryCodeInput = document.getElementById('countryCode');
+            
+            if (countrySelect && countryCodeInput) {
+                countrySelect.addEventListener('change', (e) => {
+                    countryCodeInput.value = e.target.value;
+                });
+            }
+        });
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
