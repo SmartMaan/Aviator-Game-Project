@@ -437,6 +437,73 @@
             font-size: 16px;
         }
 
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #8e8e93;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .empty-title {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #000000;
+        }
+
+        .empty-subtitle {
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        /* New Chat Styles */
+        .new-chat {
+            color: #8e8e93 !important;
+            font-style: italic;
+        }
+
+        .online-indicator {
+            font-size: 12px;
+            color: #34c759;
+            font-weight: 500;
+            margin-left: 8px;
+        }
+
+        /* Empty Chat State */
+        .empty-chat-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding: 40px 20px;
+            text-align: center;
+            color: #8e8e93;
+        }
+
+        .empty-chat-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.6;
+        }
+
+        .empty-chat-title {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #000000;
+        }
+
+        .empty-chat-subtitle {
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
         /* Messages Container */
         .messages-container {
             flex: 1;
@@ -1631,6 +1698,9 @@
             setInterval(updateStatusTime, 1000);
             setupAuth();
             setupNotifications();
+            
+            // Update user activity periodically
+            setInterval(updateUserActivity, 30000); // Every 30 seconds
         });
 
         function updateStatusTime() {
@@ -1811,28 +1881,60 @@
             const chatList = document.getElementById('chatList');
             chatList.innerHTML = '';
 
-            // Sort chats by last message timestamp
-            const sortedChats = Object.entries(chats).sort((a, b) => {
-                return b[1].lastMessage.timestamp - a[1].lastMessage.timestamp;
+            // Get all users and create chat items
+            const userEntries = Object.entries(users);
+            
+            if (userEntries.length === 0) {
+                // Show empty state
+                chatList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">💬</div>
+                        <div class="empty-title">No contacts yet</div>
+                        <div class="empty-subtitle">When people register, they'll appear here</div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Sort users: online first, then by last seen
+            const sortedUsers = userEntries.sort((a, b) => {
+                const userA = a[1];
+                const userB = b[1];
+                
+                // Online users first
+                if (userA.online && !userB.online) return -1;
+                if (!userA.online && userB.online) return 1;
+                
+                // Then by last seen (most recent first)
+                return userB.lastSeen - userA.lastSeen;
             });
 
-            sortedChats.forEach(([chatId, chat]) => {
-                const otherUserId = chat.participants.find(id => id !== currentUser.uid);
-                const user = users[otherUserId];
+            sortedUsers.forEach(([userId, user]) => {
+                const chatId = generateChatId(currentUser.uid, userId);
+                const chat = chats[chatId];
                 
-                if (!user) return;
-
                 const chatItem = document.createElement('div');
                 chatItem.className = 'chat-item ripple';
-                chatItem.onclick = () => openChat(chatId, otherUserId);
+                chatItem.onclick = () => openChat(chatId, userId);
 
-                const timeText = formatTime(chat.lastMessage.timestamp);
-                const isOwnMessage = chat.lastMessage.senderId === currentUser.uid;
-                const messageText = chat.lastMessage.text;
+                let timeText = '';
+                let messageText = 'Tap to start chatting';
+                let isOwnMessage = false;
+                let unreadCount = 0;
+
+                if (chat && chat.lastMessage) {
+                    timeText = formatTime(chat.lastMessage.timestamp);
+                    isOwnMessage = chat.lastMessage.senderId === currentUser.uid;
+                    messageText = chat.lastMessage.text;
+                    unreadCount = chat.unreadCount || 0;
+                } else {
+                    // Show last seen time for users without messages
+                    timeText = user.online ? 'online' : formatLastSeen(user.lastSeen);
+                }
 
                 chatItem.innerHTML = `
                     <div class="chat-avatar">
-                        ${user.avatar}
+                        ${user.avatar || user.displayName.charAt(0).toUpperCase()}
                         ${user.online ? '<div class="online-dot"></div>' : ''}
                     </div>
                     <div class="chat-content">
@@ -1841,11 +1943,12 @@
                             <div class="chat-time">${timeText}</div>
                         </div>
                         <div class="chat-message-row">
-                            <div class="chat-last-message">
-                                ${isOwnMessage ? 'You: ' : ''}${messageText}
+                            <div class="chat-last-message ${!chat || !chat.lastMessage ? 'new-chat' : ''}">
+                                ${isOwnMessage && chat && chat.lastMessage ? 'You: ' : ''}${messageText}
                             </div>
                             <div class="chat-badges">
-                                ${chat.unreadCount > 0 ? `<div class="unread-badge">${chat.unreadCount}</div>` : ''}
+                                ${unreadCount > 0 ? `<div class="unread-badge">${unreadCount}</div>` : ''}
+                                ${user.online ? '<div class="online-indicator">online</div>' : ''}
                             </div>
                         </div>
                     </div>
@@ -1855,24 +1958,65 @@
             });
         }
 
+        function formatLastSeen(timestamp) {
+            const now = Date.now();
+            const diff = now - timestamp;
+            
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+            
+            if (minutes < 1) return 'just now';
+            if (minutes < 60) return `${minutes}m ago`;
+            if (hours < 24) return `${hours}h ago`;
+            if (days < 7) return `${days}d ago`;
+            
+            return new Date(timestamp).toLocaleDateString();
+        }
+
         function openChat(chatId, otherUserId) {
             currentChatId = chatId;
             currentChatUserId = otherUserId;
             const user = users[otherUserId];
 
-            // Update chat header
-            document.getElementById('chatName').textContent = user.displayName;
-            document.getElementById('chatAvatar').textContent = user.avatar;
-            document.getElementById('chatStatus').textContent = getLastSeenText(user);
+            if (!user) {
+                console.error('User not found:', otherUserId);
+                return;
+            }
+
+            // Create chat if it doesn't exist
+            if (!chats[chatId]) {
+                chats[chatId] = {
+                    participants: [currentUser.uid, otherUserId],
+                    messages: [],
+                    lastMessage: null,
+                    unreadCount: 0,
+                    otherUserId: otherUserId
+                };
+            }
+
+            // Update chat header with click handlers for profile
+            const chatNameElement = document.getElementById('chatName');
+            const chatAvatarElement = document.getElementById('chatAvatar');
+            
+            chatNameElement.textContent = user.displayName;
+            chatNameElement.onclick = () => showUserProfile(user);
+            chatNameElement.style.cursor = 'pointer';
+            
+            chatAvatarElement.textContent = user.avatar || user.displayName.charAt(0).toUpperCase();
+            chatAvatarElement.onclick = () => showUserProfile(user);
+            chatAvatarElement.style.cursor = 'pointer';
+            
+            // Update status text
+            const statusText = user.online ? 'online' : `last seen ${formatLastSeen(user.lastSeen)}`;
+            document.getElementById('chatStatus').textContent = statusText;
             
             const onlineDot = document.getElementById('onlineDot');
             onlineDot.style.display = user.online ? 'block' : 'none';
 
             // Clear unread count
-            if (chats[chatId]) {
-                chats[chatId].unreadCount = 0;
-                updateChatList();
-            }
+            chats[chatId].unreadCount = 0;
+            updateChatList();
 
             loadMessages(chatId);
             showScreen('chatScreen');
@@ -1882,7 +2026,31 @@
             const messagesContainer = document.getElementById('messagesContainer');
             messagesContainer.innerHTML = '';
 
-            // Mock messages for demo
+            const chat = chats[chatId];
+            if (!chat || !chat.messages || chat.messages.length === 0) {
+                // Show empty chat state
+                messagesContainer.innerHTML = `
+                    <div class="empty-chat-state">
+                        <div class="empty-chat-icon">💬</div>
+                        <div class="empty-chat-title">No messages yet</div>
+                        <div class="empty-chat-subtitle">Send a message to start the conversation</div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Load actual messages from chat
+            chat.messages.forEach(message => {
+                appendMessage(message);
+            });
+
+            setTimeout(scrollToBottom, 100);
+        }
+
+        function appendMessage(message) {
+            const messagesContainer = document.getElementById('messagesContainer');
+            
+            // Mock messages for demo (only if no real messages exist)
             const messages = [
                 {
                     id: '1',
@@ -1976,19 +2144,38 @@
                 status: 'sent'
             };
 
+            // Ensure chat exists
+            if (!chats[currentChatId]) {
+                chats[currentChatId] = {
+                    participants: [currentUser.uid, currentChatUserId],
+                    messages: [],
+                    lastMessage: null,
+                    unreadCount: 0,
+                    otherUserId: currentChatUserId
+                };
+            }
+
+            // Add message to chat data
+            chats[currentChatId].messages.push(message);
+
+            // Clear empty state if exists
+            const messagesContainer = document.getElementById('messagesContainer');
+            const emptyState = messagesContainer.querySelector('.empty-chat-state');
+            if (emptyState) {
+                emptyState.remove();
+            }
+
             // Add message to UI
             const messageElement = createMessageElement(message);
-            document.getElementById('messagesContainer').appendChild(messageElement);
+            messagesContainer.appendChild(messageElement);
 
             // Update chat list
-            if (chats[currentChatId]) {
-                chats[currentChatId].lastMessage = {
-                    text: text,
-                    timestamp: message.timestamp,
-                    senderId: currentUser.uid
-                };
-                updateChatList();
-            }
+            chats[currentChatId].lastMessage = {
+                text: text,
+                timestamp: message.timestamp,
+                senderId: currentUser.uid
+            };
+            updateChatList();
 
             // Clear input
             input.value = '';
@@ -2714,15 +2901,78 @@
         // Load all registered users into the app's users object
         function loadAllUsers() {
             users = {}; // Clear existing users
+            chats = {}; // Clear existing chats
             
             // Add all registered users except current user
             registeredUsers.forEach(user => {
                 if (user.uid !== currentUser.uid) {
-                    users[user.uid] = user;
+                    users[user.uid] = {
+                        ...user,
+                        online: Math.random() > 0.5, // Random online status for demo
+                        lastSeen: user.online ? Date.now() : Date.now() - Math.random() * 3600000
+                    };
+                    
+                    // Create a chat room for each user
+                    const chatId = generateChatId(currentUser.uid, user.uid);
+                    chats[chatId] = {
+                        participants: [currentUser.uid, user.uid],
+                        messages: [],
+                        lastMessage: null,
+                        unreadCount: 0,
+                        otherUserId: user.uid
+                    };
                 }
             });
             
+            // Update chat list display
+            updateChatList();
             console.log('Loaded users:', Object.keys(users).length);
+        }
+
+        function generateChatId(userId1, userId2) {
+            // Create consistent chat ID regardless of order
+            const ids = [userId1, userId2].sort();
+            return `chat_${ids[0]}_${ids[1]}`;
+        }
+
+        function updateUserActivity() {
+            // Randomly update user online status and last seen
+            Object.keys(users).forEach(userId => {
+                const user = users[userId];
+                
+                // 20% chance to change online status
+                if (Math.random() < 0.2) {
+                    user.online = !user.online;
+                    user.lastSeen = Date.now();
+                    
+                    // Update chat header if this user is currently open
+                    if (currentChatUserId === userId) {
+                        const statusText = user.online ? 'online' : `last seen ${formatLastSeen(user.lastSeen)}`;
+                        document.getElementById('chatStatus').textContent = statusText;
+                        document.getElementById('onlineDot').style.display = user.online ? 'block' : 'none';
+                    }
+                }
+            });
+            
+            // Update chat list to reflect new statuses
+            updateChatList();
+        }
+
+        function showUserProfile(user) {
+            alert(`👤 User Profile
+
+Name: ${user.displayName}
+Username: @${user.username || 'Not set'}
+Phone: ${user.phone || 'Not available'}
+Email: ${user.email || 'Not available'}
+Bio: ${user.bio || 'No bio available'}
+Status: ${user.online ? '🟢 Online' : '⚫ Last seen ' + formatLastSeen(user.lastSeen)}
+
+📱 Features coming soon:
+• User profile screen
+• Media sharing
+• Voice messages
+• Video calls`);
         }
 
         // Call this on page load
